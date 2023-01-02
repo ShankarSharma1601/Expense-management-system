@@ -3,3 +3,7 @@
     margin: 0;
     box-sizing: border-box;
 }
+
+.content{
+    height: 80vh;
+}
