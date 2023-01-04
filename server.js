@@ -17,9 +17,10 @@ app.use(express.json());
 app.use(cors());
 
 //routes
-app.get("/", (req, res) => {
-  res.send(`Hello from server`);
-});
+app.use("/api/v1/users", require("./routes/userRoute"));
+// app.get("/", (req, res) => {
+//   res.send(`Hello from server`);
+// });
 
 //PORT
 const PORT = process.env.PORT || 8080;
