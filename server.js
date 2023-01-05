@@ -16,8 +16,13 @@ app.use(morgan("dev"));
 app.use(express.json());
 app.use(cors());
 
-//routes
+// routes
+// user routes
 app.use("/api/v1/users", require("./routes/userRoute"));
+
+//transaction routes
+app.use("/api/v1/transaction", require("./routes/transactionRoute"));
+
 // app.get("/", (req, res) => {
 //   res.send(`Hello from server`);
 // });
