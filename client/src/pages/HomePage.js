@@ -1,60 +1,71 @@
-import React, { useState , useEffect } from "react";
-import { Form, Input, message, Modal, Select, Table } from "antd";
+import React, { useState, useEffect } from "react";
+import { Form, Input, message, Modal, Select, Table, DatePicker } from "antd";
 import Layout from "./../components/Layout/Layout";
 import axios from "axios";
 import Spinner from "../components/Spinner";
+import moment from 'moment'
+const { RangePicker } = DatePicker
+
 
 const HomePage = () => {
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [allTransaction , setAllTransaction] = useState([])
+  const [allTransaction, setAllTransaction] = useState([]);
+  const [frequency, setFrequency] = useState("7");
+  const [selectedDate , setSelectedDate] = useState([])
+  const [type , setType] = useState('all')
 
   // Table Data
   const columns = [
     {
-      title : 'Date',
-      dataIndex: 'date'
+      title: "Date",
+      dataIndex: "date",
+      render: (text) => <span>{moment(text).format('YYYY-MM-DD')}</span>
     },
     {
-      title : 'Amount',
-      dataIndex: 'amount'
+      title: "Amount",
+      dataIndex: "amount",
     },
     {
-      title : 'Type',
-      dataIndex: 'type'
+      title: "Type",
+      dataIndex: "type",
     },
     {
-      title : 'Category',
-      dataIndex: 'category'
+      title: "Category",
+      dataIndex: "category",
     },
     {
-      title : 'Reference',
-      dataIndex: 'reference'
+      title: "Reference",
+      dataIndex: "reference",
     },
     {
-      title : 'Actions'
-    }
-  ]
-
-  // Get All Transaction
-  const getAllTransaction = async() =>{
-    try {
-      const user = JSON.parse(localStorage.getItem('user'))
-      setLoading(true)
-      const res = await axios.post('/transaction/get-transaction' , {userid:user._id})
-      setLoading(false)
-      setAllTransaction(res.data);
-      console.log(res.data);
-    } catch (error) {
-      console.log(error);
-      message.error('Fetch Issue With Transaction')
-    }
-  }
+      title: "Actions",
+    },
+  ];
 
   // useEffect
-     useEffect(() =>{ 
-       getAllTransaction()
-     },[])
+  useEffect(() => {
+    // Get All Transaction
+    const getAllTransaction = async () => {
+      try {
+        const user = JSON.parse(localStorage.getItem("user"));
+        setLoading(true);
+        const res = await axios.post("/transaction/get-transaction", {
+          userid: user._id,
+          frequency,
+          selectedDate,
+          type
+        });
+        setLoading(false);
+        setAllTransaction(res.data);
+        console.log(res.data);
+      } catch (error) {
+        console.log(error);
+        message.error("Fetch Issue With Transaction");
+      }
+    };
+    getAllTransaction();
+  }, [frequency , selectedDate, type]);
 
   // form handling
   const handleSubmit = async (values) => {
@@ -78,7 +89,25 @@ const HomePage = () => {
     <Layout>
       {loading && <Spinner />}
       <div className="filters">
-        <div>Range Filters</div>
+        <div>
+          <h6>Select Frequency</h6>
+          <Select value={frequency} onChange={(values) => setFrequency(values)}>
+            <Select.Option value="7">Last 1 Week</Select.Option>
+            <Select.Option value="30">Last 1 Month</Select.Option>
+            <Select.Option value="365">Last 1 Year</Select.Option>
+            <Select.Option value="custom">Custom</Select.Option>
+          </Select>
+          {frequency === 'custom' && <RangePicker value={selectedDate} onChange={(values)=>setSelectedDate(values)} /> }
+        </div>
+        <div>
+          <h6>Select Type</h6>
+          <Select value={type} onChange={(values) => setType(values)}>
+            <Select.Option value="all">All</Select.Option>
+            <Select.Option value="income">Income</Select.Option>
+            <Select.Option value="expense">Expense</Select.Option>
+          </Select>
+          {frequency === 'custom' && <RangePicker value={selectedDate} onChange={(values)=>setSelectedDate(values)} /> }
+        </div>
         <div>
           <button
             className="btn btn-primary"
@@ -89,7 +118,7 @@ const HomePage = () => {
         </div>
       </div>
       <div className="content">
-        <Table columns={columns} dataSource ={allTransaction} />
+        <Table columns={columns} dataSource={allTransaction} />
       </div>
       <Modal
         title="Add Transaction"
