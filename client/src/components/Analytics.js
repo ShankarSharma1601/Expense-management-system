@@ -2,6 +2,19 @@ import { Progress } from "antd";
 import React from "react";
 
 const Analytics = ({ allTransaction }) => {
+  //category
+  const categories = [
+    "salary",
+    "tip",
+    "project",
+    "food",
+    "movie",
+    "bills",
+    "medical",
+    "fee",
+    "tax",
+  ];
+
   // Total Transaction
   const totalTransaction = allTransaction.length;
   const totalIncomeTransactions = allTransaction.filter(
@@ -70,10 +83,10 @@ const Analytics = ({ allTransaction }) => {
             <div className="card-header">Total Turnover : {totalTurnover}</div>
             <div className="card-body">
               <h5 className="text-success">
-                Income : {totalIncomeTurnover.length}
+                Income : {totalIncomeTurnover}
               </h5>
               <h5 className="text-danger">
-                Expense : {totalExpenseTurnover.length}
+                Expense : {totalExpenseTurnover}
               </h5>
               <div>
                 <Progress
@@ -91,6 +104,58 @@ const Analytics = ({ allTransaction }) => {
               </div>
             </div>
           </div>
+        </div>
+      </div>
+      <div className="row mt-3">
+        <div className="col-md-4">
+          <h4>Category Wise Income</h4>
+          {
+            categories.map(category =>{
+              const amount = allTransaction
+                .filter(
+                  (transaction) => 
+                    transaction.type === 'income' && 
+                    transaction.category === category
+                ).reduce(
+                  (acc , transaction) => acc + transaction.amount , 0
+                )
+                return (
+                  amount > 0 && 
+                  <div className="card">
+                    <div className="card-body">
+                      <h5>{category}</h5>
+                      <Progress 
+                        percent={((amount / totalIncomeTurnover) * 100).toFixed(0)}/>
+                    </div>
+                  </div>
+                )
+            })
+          }
+        </div>
+        <div className="col-md-4">
+          <h4>Category Wise Expense</h4>
+          {
+            categories.map(category =>{
+              const amount = allTransaction
+                .filter(
+                  (transaction) => 
+                    transaction.type === 'expense' && 
+                    transaction.category === category
+                ).reduce(
+                  (acc , transaction) => acc + transaction.amount , 0
+                )
+                return (
+                  amount > 0 && 
+                  <div className="card">
+                    <div className="card-body">
+                      <h5>{category}</h5>
+                      <Progress 
+                        percent={((amount / totalExpenseTurnover) * 100).toFixed(0)}/>
+                    </div>
+                  </div>
+                )
+            })
+          }
         </div>
       </div>
     </>
